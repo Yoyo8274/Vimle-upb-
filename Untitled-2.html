@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Consumption Calculator</title>
+    <!-- Include Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        .form-container div {
+            margin-bottom: 10px;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .add-button {
+            background-color: #4CAF50;
+        }
+        .reset-button {
+            background-color: red;
+        }
+        .save-button {
+            background-color: blue;
+        }
+        .buttons-container {
+            display: flex;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            min-width: 150px; /* Set a minimum width for table cells */
+        }
+        tfoot td {
+            font-weight: bold;
+        }
+        .download-icon::before {
+            content: "\f019"; /* Font Awesome download icon */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            margin-right: 5px;
+        }
+        .formula {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .formula span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="formula">
+        Formula: <span>Energy (Wh) = Power (Watt) × Time (hours)</span>
+    </div>
+    <div class="form-container">
+        <div>
+            <label for="componentName">Component Name:</label>
+            <input type="text" id="componentName" name="componentName" control-id="ControlID-28">
+        </div>
+        <div>
+            <label for="power">Power (Watt):</label>
+            <input type="number" id="power" name="power" control-id="ControlID-29">
+        </div>
+        <div>
+            <label for="timeUsed">Time Used (hours):</label>
+            <input type="number" id="timeUsed" name="timeUsed" control-id="ControlID-30">
+        </div>
+        <div>
+            <button class="add-button" onclick="addComponent()" control-id="ControlID-31">Add Component</button>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Component Name</th>
+                <th>Power (Watt)</th>
+                <th>Time Used (hours)</th>
+                <th>Energy Consumed (Wh)</th>
+            </tr>
+        </thead>
+        <tbody id="componentsTableBody">
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">Total Energy Consumed (Wh)</td>
+                <td id="totalEnergyConsumed">0</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="buttons-container">
+        <button class="reset-button" onclick="resetCalculations()" control-id="ControlID-32">Reset</button>
+        <button class="save-button download-icon" onclick="saveAsCSV()" control-id="ControlID-33">Save as CSV</button>
+    </div>
+
+    <script>
+        let totalEnergy = 0;
+
+        function addComponent() {
+            const componentName = document.getElementById('componentName').value;
+            const power = parseFloat(document.getElementById('power').value);
+            const timeUsed = parseFloat(document.getElementById('timeUsed').value);
+
+            if (componentName && !isNaN(power) && !isNaN(timeUsed)) {
+                const energyConsumed = power * timeUsed;
+                totalEnergy += energyConsumed;
+
+                const tableBody = document.getElementById('componentsTableBody');
+                const row = document.createElement('tr');
+
+                const componentNameCell = document.createElement('td');
+                componentNameCell.textContent = componentName;
+                row.appendChild(componentNameCell);
+
+                const powerCell = document.createElement('td');
+                powerCell.textContent = power;
+                row.appendChild(powerCell);
+
+                const timeUsedCell = document.createElement('td');
+                timeUsedCell.textContent = timeUsed;
+                row.appendChild(timeUsedCell);
+
+                const energyConsumedCell = document.createElement('td');
+                energyConsumedCell.textContent = energyConsumed;
+                row.appendChild(energyConsumedCell);
+
+                tableBody.appendChild(row);
+
+                // Update total energy consumed
+                document.getElementById('totalEnergyConsumed').textContent = totalEnergy;
+
+                // Clear input fields
+                document.getElementById('componentName').value = '';
+                document.getElementById('power').value = '';
+                document.getElementById('timeUsed').value = '';
+            } else {
+                alert('Please fill in all fields with valid values.');
+            }
+        }
+
+        function resetCalculations() {
+            // Clear the table body
+            document.getElementById('componentsTableBody').innerHTML = '';
+            // Reset total energy consumed
+            totalEnergy = 0;
+            document.getElementById('totalEnergyConsumed').textContent = totalEnergy;
+        }
+
+        function saveAsCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Component Name,Power (Watt),Time Used (hours),Energy Consumed (Wh)\n";
+
+            const rows = document.querySelectorAll("#componentsTableBody tr");
+            rows.forEach(row => {
+                const columns = row.querySelectorAll("td");
+                const rowData = Array.from(columns).map(column => column.textContent).join(",");
+                csvContent += rowData + "\n";
+            });
+
+            // Add total energy consumed row
+            csvContent += `Total Energy Consumed,, ,${totalEnergy}\n`;
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "energy_consumption.csv");
+            document.body.appendChild(link);
+
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
