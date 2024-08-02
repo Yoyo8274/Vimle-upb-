@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Consumption Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .formula {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .formula span {
+            font-weight: bold;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .form-container div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .form-container label {
+            flex: 0 0 150px; /* Adjust the width of the labels as needed */
+            margin-right: 10px;
+        }
+        .form-container input {
+            flex: 1;
+            width: 150px; /* Set a fixed width for the input fields */
+            padding: 5px;
+        }
+        .buttons-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .add-button, .reset-button, .save-button {
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .add-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .reset-button {
+            background-color: red;
+            color: white;
+        }
+        .save-button {
+            background-color: blue;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="formula">
+    Formula: <span>Energy (Wh) = Power (Watt) × Time (hours)</span>
+</div>
+
+<div class="form-container">
+    <div>
+        <label for="componentName">Component Name:</label>
+        <input type="text" id="componentName" name="componentName">
+    </div>
+    <div>
+        <label for="power">Power (Watt):</label>
+        <input type="number" id="power" name="power">
+    </div>
+    <div>
+        <label for="timeUsed">Time Used (hours):</label>
+        <input type="number" id="timeUsed" name="timeUsed">
+    </div>
+    <div>
+        <button class="add-button" onclick="addComponent()">Add Component</button>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Component Name</th>
+            <th>Power (Watt)</th>
+            <th>Time Used (hours)</th>
+            <th>Energy Consumed (Wh)</th>
+        </tr>
+    </thead>
+    <tbody id="componentsTableBody">
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3">Total Energy Consumed (Wh)</td>
+            <td id="totalEnergyConsumed">0</td>
+        </tr>
+    </tfoot>
+</table>
+
+<div class="buttons-container">
+    <button class="reset-button" onclick="resetCalculations()">Reset</button>
+    <button class="save-button" onclick="saveAsCSV()">Save as CSV ↓</button>
+</div>
+
+<script>
+    let totalEnergy = 0;
+
+    function addComponent() {
+        const componentName = document.getElementById('componentName').value;
+        const power = parseFloat(document.getElementById('power').value);
+        const timeUsed = parseFloat(document.getElementById('timeUsed').value);
